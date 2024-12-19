@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\LoginController as AdminLoginController;
 use App\Http\Controllers\admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\frontController;
 
 Route::group(["prefix"=> "account"], function () {
 
@@ -33,9 +34,13 @@ Route::group(["prefix"=> "account"], function () {
 });
 
 Route::controller(UserController::class)->group(function () {
-Route::post('SendCodeToUserByEmail','SendCodeToUserByEmail')->name('SendCodeToUserByEmail');
+        Route::post('SendCodeToUserByEmail','SendCodeToUserByEmail')->name('SendCodeToUserByEmail');
+        Route::post('SendCodeToRegisterUser', 'SendCodeToRegisterUser')->name('SendCodeToRegisterUser');
     });
 
+    Route::controller(frontController::class)->group(function () {
+        Route::get('index','index')->name('index');
+    });
 
 
 //--------------------admin --------------------------

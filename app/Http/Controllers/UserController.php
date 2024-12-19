@@ -38,28 +38,81 @@ class UserController extends Controller
     $code = rand(100000, 999999);
     
     // send this code to user based on his/her email
-    Mail::to($userEmail)->send(new CodeMail($code));
+    Mail::to($userEmail)->send(new CodeMail($code, $name));
     
     // create a cache variable to save user data for 10 minutes
     Cache::put('user_data_' . $code, [
     'code' => $code,
     'name' => $name,
+    'email'=>$userEmail,
     'password' => $password
     ], now()->addMinutes(10));
     
     return back()->with([
-    'MessageSuccess' => __('commenMessages.Send code successfully'),
+    'MessageTransaction' => __('commenMessages.Send code successfully'),
     'codeToEmail' => $code,
-    'Result' => false
+    'Result' => true
     ], 200);
     } catch (\Exception $e) {
     Log::error('Error sending email: ' . $e->getMessage());
-    return back()->withErrors(['error' => 'Failed to send email. Please try again.']);
+    // return back()->withErrors(['error' => 'Failed to send email. Please try again.']);
+    return back()->with([
+        'MessageTransaction' => __('commenMessages.Sending code has issue'),
+        'Result' => false
+        ], 200);
     }
     } else {
-    return back()->withErrors($validator);
+    // return back()->withErrors($validator);
+    return back()->with([
+        'MessageTransaction' =>$validator,
+        'Result' => false
+        ], 200);
     }
     }
+
+    public function SendCodeToRegisterUser(Request $request)
+    {
+        $code = $request->input('emialCode');
+    
+        if (Cache::has('user_data_' . $code)) {
+            // داده‌ها در کش وجود دارند
+            $userData = Cache::get('user_data_' . $code);
+    
+            // دسترسی به داده‌های ذخیره شده
+            $code = $userData['code'];
+            $name = $userData['name'];
+            $password = $userData['password'];
+            $email = $userData['email'];
+    
+            // ایجاد کاربر جدید
+            $newUser = new User();
+            $newUser->name = $name;
+            $newUser->email = $email;
+            $newUser->password = $password;
+    
+            if ($newUser->save()) {
+                session()->flush(); // حذف تمام داده‌های سشن بعد از ذخیره موفقیت‌آمیز
+                return back()->with([
+                    'MessageTransaction' => __('commenMessages.Register is successful'),
+                    'sendCodeSuccess' => true,
+                    'ResultSendCode' => true
+                ]);
+            } else {
+                return back()->with([
+                    'MessageTransactionSendCode' => __('commenMessages.Register has problem'),
+                    'ResultSendCode' => false
+                ]);
+            }
+    
+        } else {
+            // داده‌ها در کش وجود ندارند
+            return back()->with([
+                'MessageTransactionSendCode' => __('commenMessages.Sent code is incorrect or expired'),
+                'ResultSendCode' => false
+            ]);
+        }
+    }
+    
             
     
 }

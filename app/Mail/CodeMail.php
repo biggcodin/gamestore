@@ -11,20 +11,23 @@ class CodeMail extends Mailable
 {
 use Queueable, SerializesModels;
 
-public $code;
+public $code, $name;
+
 
 /**
 * Create a new message instance.
 */
-public function __construct($code)
+public function __construct($code, $name)
 {
 $this->code = $code;
+$this->name= $name;
 }
 
 public function build()
 {
 return $this->view('emails.code')
-->with(['code' => $this->code]);
+->with(['code' => $this->code,
+'name'=>$this->name]);
 }
 
 /**

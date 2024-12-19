@@ -169,15 +169,57 @@
             <i class="fas fa-gamepad icon"></i>
 
             <h2>Register</h2>
-            @if (session()->has('MessageSuccess'))
-                <div class="alert alert-success">
-                    {{ session('MessageSuccess') }}
-                </div>
+            @if (session()->has('Result'))
+                @if (session('Result') == true)
+                    <div class="alert alert-success">
+                        {{ session('MessageTransaction') }}
+                    </div>
+                @else
+                    @if (session()->has('sendCodeSuccess'))
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                window.location.href = "{{ route('index') }}";
+                            });
+                        </script>
+                    @endif
+                    <div class="alert alert-danger">
+                        {{ session('MessageTransaction') }}
+                    </div>
+                @endif
+
                 <script>
-                    document.getElementById('userInitialDataDive').style.display = 'none';
-                    document.getElementById('userCodeDive').style.display = "block";
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.getElementById('userInitialDataDive').style.display = 'none';
+                        document.getElementById('userCodeDive').style.display = "block";
+                        document.getElementById('emialCode').value = {{ session('codeToEmail') }}
+
+                    });
                 </script>
             @endif
+
+            {{-- To handle the send Code --}}
+            @if (session()->has('ResultSendCode'))
+                @if (session('ResultSendCode') == true)
+                    <div class="alert alert-success">
+                        {{ session('MessageTransaction') }}
+                    </div>
+                @else
+                    <div class="alert alert-danger">
+                        {{ session('MessageTransactionSendCode') }}
+                    </div>
+                @endif
+
+                @if (session()->has('sendCodeSuccess'))
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            window.location.href = "{{ route('index') }}";
+                            document.getElementById('userInitialDataDive').style.display = 'none';
+                            document.getElementById('userCodeDive').style.display = "none";
+                        });
+                    </script>
+                @endif
+            @endif
+
 
             <div id="userInitialDataDive">
                 <form method="post" action="{{ route('SendCodeToUserByEmail') }}">
@@ -221,9 +263,13 @@
                 </form>
             </div>
             <div id="userCodeDive" style="display: none">
-                <input type="text" id="emialCode" class="form-control"
-                    value="{{ session()->has('codeToEmail') ?? '' }}">
-                <button type="submit" class="btn btn-primary">Send Code</button>
+                <form action="{{ route('SendCodeToRegisterUser') }}" method="POST">
+                    @csrf
+                    <input type="text" id="emialCode" name="emialCode" class="form-control"
+                        value="{{ session()->has('codeToEmail') ?? '' }}">
+                    <button type="submit" class="btn btn-primary">Send Code</button>
+                </form>
+
 
             </div>
 
