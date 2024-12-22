@@ -167,7 +167,6 @@
         <div class="login-card">
             <div class="animated-background"></div>
             <i class="fas fa-gamepad icon"></i>
-
             <h2>Register</h2>
             @if (session()->has('Result'))
                 @if (session('Result') == true)
@@ -178,7 +177,9 @@
                     @if (session()->has('sendCodeSuccess'))
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
-                                window.location.href = "{{ route('index') }}";
+                                setTimeout(function() { // اضافه کردن تاخیر
+                                    window.location.href = "{{ route('index') }}";
+                                }, 100);
                             });
                         </script>
                     @endif
@@ -186,13 +187,11 @@
                         {{ session('MessageTransaction') }}
                     </div>
                 @endif
-
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         document.getElementById('userInitialDataDive').style.display = 'none';
                         document.getElementById('userCodeDive').style.display = "block";
-                        document.getElementById('emialCode').value = {{ session('codeToEmail') }}
-
+                        document.getElementById('emailCode').value = "{{ session('codeToEmail') }}"; // اصلاح 
                     });
                 </script>
             @endif
@@ -208,18 +207,18 @@
                         {{ session('MessageTransactionSendCode') }}
                     </div>
                 @endif
-
                 @if (session()->has('sendCodeSuccess'))
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            window.location.href = "{{ route('index') }}";
-                            document.getElementById('userInitialDataDive').style.display = 'none';
-                            document.getElementById('userCodeDive').style.display = "none";
+                            setTimeout(function() { // اضافه کردن تاخیر
+                                window.location.href = "{{ route('index') }}";
+                                document.getElementById('userInitialDataDive').style.display = 'none';
+                                document.getElementById('userCodeDive').style.display = "none";
+                            }, 100);
                         });
                     </script>
                 @endif
             @endif
-
 
             <div id="userInitialDataDive">
                 <form method="post" action="{{ route('SendCodeToUserByEmail') }}">
@@ -262,17 +261,16 @@
                     <a href="{{ route('account.login') }}" class="forgot-password">Click here to login</a>
                 </form>
             </div>
+
             <div id="userCodeDive" style="display: none">
                 <form action="{{ route('SendCodeToRegisterUser') }}" method="POST">
                     @csrf
-                    <input type="text" id="emialCode" name="emialCode" class="form-control"
-                        value="{{ session()->has('codeToEmail') ?? '' }}">
+                    <input type="text" id="emailCode" name="emailCode" class="form-control"
+                        value="{{ session()->has('codeToEmail') ? session('codeToEmail') : '' }}">
+                    <!-- اصلاح مقداردهی -->
                     <button type="submit" class="btn btn-primary">Send Code</button>
                 </form>
-
-
             </div>
-
             <div class="social-login">
                 <a href="#"><i class="fab fa-facebook-f"></i></a>
                 <a href="#"><i class="fab fa-twitter"></i></a>
@@ -280,7 +278,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
