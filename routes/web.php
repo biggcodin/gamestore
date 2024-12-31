@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\LoginController as AdminLoginController;
 use App\Http\Controllers\admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PanelController;
 use App\Http\Controllers\frontController;
 
 // User account routes
@@ -53,14 +54,17 @@ Route::group(['prefix' => 'admin'], function () {
 
 
 
+//user panel
+
+
+    Route::get('panel', [PanelController::class, 'show'])->name('user.panel');
+
+    Route::get('setting', [PanelController::class, 'update'])->name('user.setting');
+    
 
 
 
-
-
-
-
-
-
-
-
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [PanelController::class, 'show'])->name('profile.show');
+    Route::post('/profile', [PanelController::class, 'update'])->name('profile.update');
+});
